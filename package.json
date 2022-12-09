@@ -4,5 +4,10 @@
   "main": "src/main.js",
   "repository": "https://github.com/ueckoken/gmail-discord-notifier.git",
   "author": "ueckoken",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.9.3",
+    "@types/google-apps-script": "^1.0.56",
+    "ts-migrate": "^0.1.35"
+  }
 }
