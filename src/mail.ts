@@ -1,3 +1,4 @@
+import "google-apps-script";
 // Discord 側へメッセージを送る
 function send_notify_to_discord(message: any) {
   // webhook置き場
@@ -10,7 +11,6 @@ function send_notify_to_discord(message: any) {
   };
 
   // Discordに送信する型を指定（おまじない）
-  // @ts-expect-error TS(2304): Cannot find name 'UrlFetchApp'.
   UrlFetchApp.fetch(DISCORD_WEBHOOK, {
     method: "post",
     contentType: "application/json",
@@ -21,9 +21,7 @@ function send_notify_to_discord(message: any) {
 // 新規メールを取得して、必要情報を抽出する関数
 function fetch_new_arrival_mail(interval: any) {
   // 取得
-  // @ts-expect-error TS(2304): Cannot find name 'GmailApp'.
   let myThreads = GmailApp.search(setting_search_criteria(interval));
-  // @ts-expect-error TS(2304): Cannot find name 'GmailApp'.
   let myMsgs = GmailApp.getMessagesForThreads(myThreads);
   let valMsgs = [];
   let isdraft = [];
