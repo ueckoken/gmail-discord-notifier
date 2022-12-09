@@ -22,7 +22,7 @@ function send_notify_to_discord(message: any) {
 function fetch_new_arrival_mail(interval: any) {
   // 取得
   let myThreads = GmailApp.search(setting_search_criteria(interval));
-  let myMsgs = GmailApp.getMessagesForThreads(myThreads);
+  const myMsgs = GmailApp.getMessagesForThreads(myThreads);
   let valMsgs = [];
   let isdraft = [];
 
@@ -38,7 +38,7 @@ function fetch_new_arrival_mail(interval: any) {
 
     // 添付ファイルがあるかどうか
     function is_exist_attachment_file() {
-      if (myMsgs[i].slice(-1)[0].getAttachments() != "") {
+      if (myMsgs[i].slice(-1)[0].getAttachments().length != 0) {
         return "\n添付ファイルがあります！メール本体の確認をお忘れなく";
       } else {
         return " ";
