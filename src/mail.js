@@ -1,5 +1,5 @@
 // Discord 側へメッセージを送る
-function send_notify_to_discord(message: any) {
+function send_notify_to_discord(message) {
   // webhook置き場
   const DISCORD_WEBHOOK = "Here is Discord Token";
 
@@ -10,7 +10,6 @@ function send_notify_to_discord(message: any) {
   };
 
   // Discordに送信する型を指定（おまじない）
-  // @ts-expect-error TS(2304): Cannot find name 'UrlFetchApp'.
   UrlFetchApp.fetch(DISCORD_WEBHOOK, {
     method: "post",
     contentType: "application/json",
@@ -19,11 +18,9 @@ function send_notify_to_discord(message: any) {
 }
 
 // 新規メールを取得して、必要情報を抽出する関数
-function fetch_new_arrival_mail(interval: any) {
+function fetch_new_arrival_mail(interval) {
   // 取得
-  // @ts-expect-error TS(2304): Cannot find name 'GmailApp'.
   let myThreads = GmailApp.search(setting_search_criteria(interval));
-  // @ts-expect-error TS(2304): Cannot find name 'GmailApp'.
   let myMsgs = GmailApp.getMessagesForThreads(myThreads);
   let valMsgs = [];
   let isdraft = [];
@@ -100,7 +97,7 @@ function setting_start_of_search_mail_period() {
 
 // メールの検索条件を設定
 // 詳しくはここ => https://support.google.com/mail/answer/7190?hl=ja
-function setting_search_criteria(interval: any) {
+function setting_search_criteria(interval) {
   let strTerms = "is:unread after:" + interval;
   return strTerms;
 }
