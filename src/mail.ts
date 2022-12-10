@@ -54,13 +54,13 @@ const dateSubsec = (date: Date, subSec: number): Date => new Date(date.getTime()
 
 // メールの検索条件を設定
 // 詳しくはここ => https://support.google.com/mail/answer/7190?hl=ja
-const mailSearchCond = (curFrom: number): string => `is:unread after: ${curFrom}`
+const mailSearchCond = (curFromUnixSec: number): string => `is:unread after: ${curFromUnixSec}`
 
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main (): void {
   // 1分おきにトリガーされるので61秒前から検索する
-  const newMails = fetchNewMails(mailSearchCond(dateSubsec(new Date(), 61).getTime()))
+  const newMails = fetchNewMails(mailSearchCond(Math.floor(dateSubsec(new Date(), 61).getTime() / 1000)))
   for (const mail of newMails.filter(mail => !mail.msg.isDraft()).reverse()) {
     postDiscord(mail.formattedMsg())
   }
