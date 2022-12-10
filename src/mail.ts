@@ -55,9 +55,9 @@ ${this.msg.getPlainBody().substring(0, 1700)}
   }
 }
 
-function fetchNewMails (interval: number): Mail[] {
+function fetchNewMails (searchCond: string): Mail[] {
   // 取得
-  const myThreads = GmailApp.search(mailSearchCond(interval))
+  const myThreads = GmailApp.search(searchCond)
   return GmailApp.getMessagesForThreads(myThreads).map(msg => new Mail(msg.slice(-1)[0]))
 }
 
@@ -70,14 +70,12 @@ function searchMailCurTime (): number {
 
 // メールの検索条件を設定
 // 詳しくはここ => https://support.google.com/mail/answer/7190?hl=ja
-function mailSearchCond (interval: number): string {
-  return `is:unread after: ${interval}`
-}
+const mailSearchCond = (interval: number): string => `is:unread after: ${interval}`
 
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main (): void {
-  const newMails = fetchNewMails(searchMailCurTime())
+  const newMails = fetchNewMails(mailSearchCond(searchMailCurTime()))
   for (const mail of newMails.filter(mail => !mail.msg.isDraft()).reverse()) {
     postDiscord(mail.formatedMsg())
   }
