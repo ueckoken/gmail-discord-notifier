@@ -1,9 +1,12 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "build"
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
-  "target": "ES2019"
+  "target": "ES2019",
+  "lib": ["esnext"],
+  "experimentalDecorators": true,
+  "strict": true
 }
