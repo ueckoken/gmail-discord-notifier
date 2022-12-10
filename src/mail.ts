@@ -7,8 +7,7 @@ class Mail {
   }
 
   formattedMsg (): string {
-    return `
-${this.msgHeader()}
+    return `${this.msgHeader()}
 \`\`\`txt
 [Date] ${this.msg.getDate().toString()}
 [from] ${this.msg.getFrom()}
