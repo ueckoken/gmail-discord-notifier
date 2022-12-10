@@ -18,3 +18,16 @@ jobs:
           clientSecret: ${{ secrets.UECKOKEN_CLIENT_SECRET }}
           scriptId: ${{ secrets.UECKOKEN_SCRIPT_ID }}
           command: "push"
+  deployment-shinkan:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: daikikatsuragawa/clasp-action@v1.1.0
+        with:
+          accessToken: ${{ secrets.KOKENSHINKAN_ACCESS_TOKEN }}
+          idToken: ${{ secrets.KOKENSHINKAN_ID_TOKEN }}
+          refreshToken: ${{ secrets.KOKENSHINKAN_REFRESH_TOKEN }}
+          clientId: ${{ secrets.KOKENSHINKAN_CLIENT_ID }}
+          clientSecret: ${{ secrets.KOKENSHINKAN_CLIENT_SECRET }}
+          scriptId: ${{ secrets.KOKENSHINKAN_SCRIPT_ID }}
+          command: "push"
