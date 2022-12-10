@@ -1,0 +1,22 @@
+name: deployment
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions@checkout@v3
+      - name: prepare-deploy
+        run: |
+      - uses: daikikatsuragawa/clasp-action@v1.1.0
+        with:
+          accessToken: ${{ secrets.UECKOKEN_ACCESS_TOKEN }}
+          idToken: ${{ secrets.UECKOKEN_ID_TOKEN }}
+          refreshToken: ${{ secrets.UECKOKEN_REFRESH_TOKEN }}
+          clientId: ${{ secrets.UECKOKEN_CLIENT_ID }}
+          clientSecret: ${{ secrets.UECKOKEN_CLIENT_SECRET }}
+          scriptId: ${{ secrets.UECKOKEN_SCRIPT_ID }}
+          command: "push"
