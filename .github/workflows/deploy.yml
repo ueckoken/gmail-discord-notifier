@@ -1,4 +1,4 @@
-name: deployment
+name: push code to GAS
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ jobs:
   deployment:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions@checkout@v3
+      - uses: actions/checkout@v3
       - uses: daikikatsuragawa/clasp-action@v1.1.0
         with:
           accessToken: ${{ secrets.UECKOKEN_ACCESS_TOKEN }}
