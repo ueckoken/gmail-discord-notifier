@@ -2,16 +2,16 @@ import 'google-apps-script'
 // Discord 側へメッセージを送る
 function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
   // webhook置き場
-  const DISCORD_WEBHOOK = 'Here is Discord Token'
+  const webhookUrl = PropertiesService.getScriptProperties().getProperty('DISCORD_WEBHOOK_URL')
 
   // Discordへメッセージを送信する本体
   const payload = {
-    username: 'Here is Discord webhook bot name',
+    username: PropertiesService.getScriptProperties().getProperty('WEBHOOK_USERNAME'),
     content: message
   } as const
 
   // Discordに送信する型を指定（おまじない）
-  return UrlFetchApp.fetch(DISCORD_WEBHOOK, {
+  return UrlFetchApp.fetch(webhookUrl ?? '', {
     method: 'post',
     contentType: 'application/json',
     payload: JSON.stringify(payload)
@@ -26,9 +26,8 @@ class Mail {
 
   formatedMsg (): string {
     return `
-メッセージが届きました！ 
-${this.msg.getAttachments().length !== 0 ? '添付ファイルがあります！メール本体の確認をお忘れなく' : ''}
-${this.msg.getPlainBody().length > 1700 ? '文字数が多すぎます！メール本体にて確認してください。' : ''}
+${this.msgHeader()}
+
 \`\`\`txt
 [Date]
 ${this.msg.getDate().toString()}
@@ -47,15 +46,22 @@ ${this.msg.getPlainBody().substring(0, 1700)}
 
     `
   }
+
+  msgHeader (): string {
+    const headerElem: string[] = ['メッセージが届きました！']
+    if (this.msg.getAttachments().length !== 0) { headerElem.push('添付ファイルがあります！メール本体の確認をお忘れなく') }
+    if (this.msg.getPlainBody().length >= 1700) { headerElem.push('文字数が上限に達したので途中で切りました。続きはメール本体を確認してください') }
+    return headerElem.join('\n')
+  }
 }
-function fetchNewMail (interval: number): Mail[] {
+
+function fetchNewMails (interval: number): Mail[] {
   // 取得
   const myThreads = GmailApp.search(mailSearchCond(interval))
   return GmailApp.getMessagesForThreads(myThreads).map(msg => new Mail(msg.slice(-1)[0]))
 }
 
 // 検索する時間の開始地点を設定
-// FIXME: いい感じの型制約を付ける
 function searchMailCurTime (): number {
   // 今回は61秒前を設定
   const now = Math.floor(new Date().getTime() / 1000)
@@ -71,8 +77,8 @@ function mailSearchCond (interval: number): string {
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function main (): void {
-  const newMails = fetchNewMail(searchMailCurTime())
-  for (const mail of newMails.reverse().filter(mail => !mail.msg.isDraft())) {
+  const newMails = fetchNewMails(searchMailCurTime())
+  for (const mail of newMails.filter(mail => !mail.msg.isDraft()).reverse()) {
     postDiscord(mail.formatedMsg())
   }
 }
