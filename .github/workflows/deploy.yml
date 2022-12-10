@@ -18,3 +18,4 @@ jobs:
           clientSecret: ${{ secrets.UECKOKEN_CLIENT_SECRET }}
           scriptId: ${{ secrets.UECKOKEN_SCRIPT_ID }}
           command: "push"
+          rootDIr: "./src"
