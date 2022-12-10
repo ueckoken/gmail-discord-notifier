@@ -29,16 +29,11 @@ class Mail {
 ${this.msgHeader()}
 
 \`\`\`txt
-[Date]
-${this.msg.getDate().toString()}
-[from]
-${this.msg.getFrom()}
-[to]
-${this.msg.getTo()}
-[cc]
-${this.msg.getCc()}
-[subject]
-${this.msg.getSubject()}
+[Date] ${this.msg.getDate().toString()}
+[from] ${this.msg.getFrom()}
+[to] ${this.msg.getTo()}
+[cc] ${this.msg.getCc()}
+[subject] ${this.msg.getSubject()}
 [message]
 ${this.msg.getPlainBody().substring(0, 1700)}
 
