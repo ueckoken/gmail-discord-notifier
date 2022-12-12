@@ -1,22 +1,19 @@
 import 'google-apps-script'
-
+const discordMsgMaxLen = 2000
 class Mail {
   readonly msg: GoogleAppsScript.Gmail.GmailMessage
   constructor (msg: GoogleAppsScript.Gmail.GmailMessage) {
     this.msg = msg
   }
 
-  formattedMsg (): string {
-    return `${this.msgHeader()}
+  formattedMsg (maxLen: number): string {
+    const header = this.msgHeader()
+    // code要素の中の長さをmaxLenギリギリまで詰めるようにする
+    // 余裕を持たせて30を追加している。本当はテストで境界を保証したい
+    const payloadLen = maxLen - header.length - '\n```txt\n\n```\n'.length - 30
+    return `${header}
 \`\`\`txt
-[Date] ${this.msg.getDate().toString()}
-[from] ${this.msg.getFrom()}
-[to] ${this.msg.getTo()}
-[cc] ${this.msg.getCc()}
-[subject] ${this.msg.getSubject()}
-[message]
-${this.msg.getPlainBody().substring(0, 1700)}
-
+${this.payload().substring(payloadLen)}
 \`\`\`
 `
   }
@@ -28,10 +25,22 @@ ${this.msg.getPlainBody().substring(0, 1700)}
     }
     if (this.msg.getPlainBody().length >= 1700) {
       headerElems.push(
-        '文字数が上限に達したので途中で切りました。続きはメール本体を確認してください'
+        '文字数が上限に近づいたので途中で切れている可能性があります。メール本体を確認してください'
       )
     }
     return headerElems.join('\n')
+  }
+
+  private payload (): string {
+    return `[Date] ${this.msg.getDate().toString()}
+[From] ${this.msg.getFrom()}
+[To] ${this.msg.getTo()}
+[Cc] ${this.msg.getCc()}
+[Subject] ${this.msg.getSubject()}
+[attachment] ${this.msg.getAttachments().map(a => a.getName()).join(' ')}
+
+${this.msg.getPlainBody()}
+`
   }
 }
 
@@ -76,6 +85,6 @@ function main (): void {
     mailSearchCond(Math.floor(dateSubsec(new Date(), 61).getTime() / 1000))
   )
   for (const mail of newMails.filter(mail => !mail.msg.isDraft()).reverse()) {
-    postDiscord(mail.formattedMsg())
+    postDiscord(mail.formattedMsg(discordMsgMaxLen))
   }
 }
