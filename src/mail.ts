@@ -13,7 +13,7 @@ class Mail {
     const payloadLen = maxLen - header.length - '\n```txt\n\n```\n'.length - 30
     return `${header}
 \`\`\`txt
-${this.payload().substring(payloadLen)}
+${this.payload().substring(0, payloadLen)}
 \`\`\`
 `
   }
