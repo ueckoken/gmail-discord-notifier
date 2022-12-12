@@ -10,7 +10,7 @@ class Mail {
     const header = this.msgHeader()
     // code要素の中の長さをmaxLenギリギリまで詰めるようにする
     // 余裕を持たせて30を追加している。本当はテストで境界を保証したい
-    const payloadLen = maxLen - header.length - '\n```txt\n\n```\n'.length - 30 
+    const payloadLen = maxLen - header.length - '\n```txt\n\n```\n'.length - 30
     return `${header}
 \`\`\`txt
 ${this.payload().substring(payloadLen)}
