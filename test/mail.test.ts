@@ -3,8 +3,8 @@ import { type mailAttachment, msgDescription } from '../src/mail'
 
 class AttachmentStub implements mailAttachment {
   readonly nameMock: jest.Mock
-  constructor (nameMock: jest.Mock) { this.nameMock = nameMock }
-  getName (): string {
+  constructor(nameMock: jest.Mock) { this.nameMock = nameMock }
+  getName(): string {
     return this.nameMock()
   }
 }
@@ -47,25 +47,36 @@ describe('mailHeader', () => {
   test.todo('this test will implement')
 })
 
-describe('createMsg', () => {
-  test.todo('this test will implement')
+describe("chunkMsg", () => {
+  test.each([
+    { msg: { description: "aaa", text: "あ".repeat(200) }, length: 2 }
+  ])("returns $length msgs", ({ msg, length }) => {
+    const actual = chunkMsg({ text: msg.text, description: msg.description }, 50)
+    expect(actual).toHaveLength(length)
+    expect(actual[0]).toHaveLength(50)
+  })
+})
+// describe('createMsgs', () => {
+//   const msg: mailPayload = {
+//     attachments: [],
+//     bcc: "",
+//     cc: "",
+//     date: new Date(),
+//     from: "Bob",
+//     plainBody: "",
+//     subject: "Mail subject",
+//     to: "Alice"
+//   }
+//   test("chunk msgs by limit", () => {
+//     let newMsg = msg
+//     newMsg.plainBody = "あ".repeat(200)
+//     const actual = createMsg(newMsg, 50)
+//     expect(actual).toHaveLength(4)
+//     expect(actual[0]).toHaveLength(50)
+//     expect(actual[1]).toBe("")
 
-  // const msg = {
-  //     attachments: [],
-  //     bcc: "",
-  //     cc: "",
-  //     date: "",
-  //     from: "",
-  //     plainBody: "",
-  //     subject: "",
-  //     to: ""
-  // } satisfies mailPayload
-  // test("msg over than limit", () => {
-  //     let newMsg = msg
-  //     newMsg.attachments = []
-  //     newMsg.date = null
-  //     createMsg(newMsg, 10)
-  // }
-  // )
-}
-)
+//   })
+
+
+// }
+// )

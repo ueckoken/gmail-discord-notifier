@@ -48,25 +48,34 @@ export const MailHeader = (header: mailHeader): string => {
 [attachment] ${header.attachments.map(a => a.getName()).join(' ')}
 `
 }
-
-export const createMsg = (props: mailPayload, maxLen: number): string => {
+interface msg {
+  description: string
+  text: string
+}
+export const createMsg = (props: mailPayload): msg => {
   const description = msgDescription(props)
-  const payload = `MailHeader(props)
+  const text = `${MailHeader(props)}
 
 ${props.plainBody}
 `
-  // code要素の中の長さをmaxLenギリギリまで詰めるようにする
-  // 余裕を持たせて30を追加している。本当はテストで境界を保証したい
-  const payloadLen = maxLen - description.length - '\n```txt\n\n```\n'.length - 30
-  return `${description}
-\`\`\`txt
-${payload.substring(0, payloadLen)}
-\`\`\`
-`
+  return {
+    description: description,
+    text: text
+  }
 }
 
+export const chunkMsg = (msg: msg, length: number): string[] => {
+  // code要素の中の長さをmaxLenギリギリまで詰めるようにする
+  // 余裕を持たせて30を追加している。本当はテストで境界を保証したい
+  const payloadLen = length - (msg.description.length + '\n```txt\n\n```\n'.length + 30)
+  return [`${msg.description}
+\`\`\`txt
+${msg.text.substring(0, payloadLen)}
+\`\`\`
+`]
+}
 // Discord 側へメッセージを送る
-function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
+function postDiscord(message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
   const webhookUrl = PropertiesService.getScriptProperties().getProperty(
     'DISCORD_WEBHOOK_URL'
   )
@@ -83,7 +92,7 @@ function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse 
   })
 }
 
-function fetchNewMails (searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
+function fetchNewMails(searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
   const myThreads = GmailApp.search(searchCond)
   return GmailApp.getMessagesForThreads(myThreads)
     .map(msg => msg.slice(-1)[0])
@@ -110,12 +119,20 @@ const mailSearchCond = (curFromUnixSec: number): string =>
 
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function main (): void {
+function main(): void {
   // 1分おきにトリガーされるので61秒前から検索する
   const newMails = fetchNewMails(
     mailSearchCond(Math.floor(dateSubsec(new Date(), 61).getTime() / 1000))
   )
-  for (const mail of newMails.filter(mail => !mail.isDraft()).reverse().map(v => GmailToPayload(v))) {
-    postDiscord(createMsg(mail, discordMsgMaxLen))
+  for (
+    const mail of newMails
+      .filter(mail => !mail.isDraft())
+      .map(v => GmailToPayload(v))
+      .map(payload => createMsg(payload))
+      .reverse()
+  ) {
+    for (const msg of chunkMsg(mail, discordMsgMaxLen)) {
+      postDiscord(msg)
+    }
   }
 }
