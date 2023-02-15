@@ -33,7 +33,7 @@ export const msgDescription = (props: mailMsgHeader): string => {
   }
   if (props.plainBody.length >= 1700) {
     headerElems.push(
-      '文字数が上限に近づいたので途中で切れている可能性があります。メール本体を確認してください'
+      '文字数の上限を越えたので分割して投稿しています。'
     )
   }
   return headerElems.join('\n')
