@@ -1,3 +1,4 @@
 .eslintrc.js
 .prettierrc.js
 test/**/*
+jest.config.*
