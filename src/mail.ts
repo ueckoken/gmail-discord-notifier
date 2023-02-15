@@ -94,8 +94,8 @@ export const chunkMsg = (msg: msg, length: number): string[] => {
     codeBlockFooter.length + '\n'.length
   )
   const result = new Array<string>(
-    Math.floor((msg.text.length - cur) / codeBlockCapacity) + 1 +
-    1 // description付きのmsg用
+    Math.ceil((msg.text.length - cur) / codeBlockCapacity)
+    + 1 // description付きのmsg用
   )
   result[0] = [
     msg.description,
@@ -117,7 +117,7 @@ export const chunkMsg = (msg: msg, length: number): string[] => {
   return result
 }
 // Discord 側へメッセージを送る
-function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
+function postDiscord(message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
   const webhookUrl = PropertiesService.getScriptProperties().getProperty(
     'DISCORD_WEBHOOK_URL'
   )
@@ -134,7 +134,7 @@ function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse 
   })
 }
 
-function fetchNewMails (searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
+function fetchNewMails(searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
   const myThreads = GmailApp.search(searchCond)
   return GmailApp.getMessagesForThreads(myThreads)
     .map(msg => msg.slice(-1)[0])
@@ -161,7 +161,7 @@ const mailSearchCond = (curFromUnixSec: number): string =>
 
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function main (): void {
+function main(): void {
   // 1分おきにトリガーされるので61秒前から検索する
   const newMails = fetchNewMails(
     mailSearchCond(Math.floor(dateSubsec(new Date(), 61).getTime() / 1000))
