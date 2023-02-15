@@ -59,23 +59,65 @@ export const createMsg = (props: mailPayload): msg => {
 ${props.plainBody}
 `
   return {
-    description: description,
-    text: text
+    description,
+    text
   }
 }
 
 export const chunkMsg = (msg: msg, length: number): string[] => {
   // code要素の中の長さをmaxLenギリギリまで詰めるようにする
-  // 余裕を持たせて30を追加している。本当はテストで境界を保証したい
-  const payloadLen = length - (msg.description.length + '\n```txt\n\n```\n'.length + 30)
-  return [`${msg.description}
-\`\`\`txt
-${msg.text.substring(0, payloadLen)}
-\`\`\`
-`]
+  const codeBlockHeader = '```txt'
+  const codeBlockFooter = '```'
+  const codeBlockCapacityWithDescription = length - (
+    msg.description.length + '\n'.length +
+    codeBlockHeader.length + '\n'.length +
+    '\n'.length +
+    codeBlockFooter.length + '\n'.length
+  )
+
+  if (msg.text.length <= codeBlockCapacityWithDescription) {
+    return [
+      [
+        msg.description,
+        codeBlockHeader,
+        msg.text,
+        codeBlockFooter,
+        ''
+      ].join('\n')
+    ]
+  }
+
+  let cur = codeBlockCapacityWithDescription
+  const codeBlockCapacity = length - (
+    codeBlockHeader.length + '\n'.length +
+    '\n'.length +
+    codeBlockFooter.length + '\n'.length
+  )
+  const result = new Array<string>(
+    Math.floor((msg.text.length - cur) / codeBlockCapacity) + 1 +
+    1 // description付きのmsg用
+  )
+  result[0] = [
+    msg.description,
+    codeBlockHeader,
+    msg.text.substring(0, cur),
+    codeBlockFooter,
+    ''
+  ].join('\n')
+
+  for (let i = 1; i < result.length; i++) {
+    result[i] = [
+      codeBlockHeader,
+      msg.text.substring(cur, cur + codeBlockCapacity),
+      codeBlockFooter,
+      ''
+    ].join('\n')
+    cur = cur + codeBlockCapacity
+  }
+  return result
 }
 // Discord 側へメッセージを送る
-function postDiscord(message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
+function postDiscord (message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
   const webhookUrl = PropertiesService.getScriptProperties().getProperty(
     'DISCORD_WEBHOOK_URL'
   )
@@ -92,7 +134,7 @@ function postDiscord(message: string): GoogleAppsScript.URL_Fetch.HTTPResponse {
   })
 }
 
-function fetchNewMails(searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
+function fetchNewMails (searchCond: string): GoogleAppsScript.Gmail.GmailMessage[] {
   const myThreads = GmailApp.search(searchCond)
   return GmailApp.getMessagesForThreads(myThreads)
     .map(msg => msg.slice(-1)[0])
@@ -119,7 +161,7 @@ const mailSearchCond = (curFromUnixSec: number): string =>
 
 // 実行してもらうのはこれ
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function main(): void {
+function main (): void {
   // 1分おきにトリガーされるので61秒前から検索する
   const newMails = fetchNewMails(
     mailSearchCond(Math.floor(dateSubsec(new Date(), 61).getTime() / 1000))

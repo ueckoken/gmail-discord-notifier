@@ -1,10 +1,10 @@
 import { describe } from '@jest/globals'
-import { type mailAttachment, msgDescription } from '../src/mail'
+import { type mailAttachment, msgDescription, chunkMsg } from '../src/mail'
 
 class AttachmentStub implements mailAttachment {
   readonly nameMock: jest.Mock
-  constructor(nameMock: jest.Mock) { this.nameMock = nameMock }
-  getName(): string {
+  constructor (nameMock: jest.Mock) { this.nameMock = nameMock }
+  getName (): string {
     return this.nameMock()
   }
 }
@@ -40,20 +40,58 @@ describe('msgDescription', () => {
     expect(description).toBe('メッセージが届きました！\n添付ファイルがあります！メール本体の確認をお忘れなく\n文字数が上限に近づいたので途中で切れている可能性があります。メール本体を確認してください')
   })
   test('does not call attachments getName()', () => {
-    expect(mock).toHaveBeenCalledTimes(0)
+    expect(mock).not.toHaveBeenCalled()
   })
 })
 describe('mailHeader', () => {
   test.todo('this test will implement')
 })
 
-describe("chunkMsg", () => {
-  test.each([
-    { msg: { description: "aaa", text: "あ".repeat(200) }, length: 2 }
-  ])("returns $length msgs", ({ msg, length }) => {
-    const actual = chunkMsg({ text: msg.text, description: msg.description }, 50)
-    expect(actual).toHaveLength(length)
-    expect(actual[0]).toHaveLength(50)
+describe('chunkMsg', () => {
+  test('does not chunk short message', () => {
+    const actual = chunkMsg({ description: 'this is description', text: 'this is text.' }, 50)
+    expect(actual).toHaveLength(1)
+    expect(actual[0]).toBe('this is description\n```txt\nthis is text.\n```\n')
+  })
+  test('chunks long message', () => {
+    const chunkLen = 30
+    const text = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the' // the length of this text is 99.
+    const actual = chunkMsg({ description: 'あ'.repeat(10), text }, chunkLen)
+    expect(actual).toHaveLength(7)
+    expect(actual[0]).toMatch(/ああああああああああ\n```txt\n.*\n```\n/)
+    expect(actual[1]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[2]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[3]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[4]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[5]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[6]).toMatch(/```txt\n.*\n```\n/)
+
+    expect(actual[0]).toHaveLength(chunkLen)
+    expect(actual[1]).toHaveLength(chunkLen)
+    expect(actual[2]).toHaveLength(chunkLen)
+    expect(actual[3]).toHaveLength(chunkLen)
+    expect(actual[4]).toHaveLength(chunkLen)
+    expect(actual[5]).toHaveLength(chunkLen)
+    expect(actual[6]).toHaveLength(14)
+  })
+  test('chunks long message', () => {
+    const chunkLen = 30
+    const text = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been t' // the length of this text is 97.
+    const actual = chunkMsg({ description: 'あ'.repeat(10), text }, chunkLen)
+    expect(actual).toHaveLength(6)
+    expect(actual[0]).toMatch(/ああああああああああ\n```txt\n.*\n```\n/)
+    expect(actual[1]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[2]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[3]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[4]).toMatch(/```txt\n.*\n```\n/)
+    expect(actual[5]).toMatch(/```txt\n.*\n```\n/)
+
+    expect(actual[0]).toHaveLength(chunkLen)
+    expect(actual[1]).toHaveLength(chunkLen)
+    expect(actual[2]).toHaveLength(chunkLen)
+    expect(actual[3]).toHaveLength(chunkLen)
+    expect(actual[4]).toHaveLength(chunkLen)
+    expect(actual[5]).toHaveLength(chunkLen)
   })
 })
 // describe('createMsgs', () => {
@@ -76,7 +114,6 @@ describe("chunkMsg", () => {
 //     expect(actual[1]).toBe("")
 
 //   })
-
 
 // }
 // )
