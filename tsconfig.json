@@ -7,7 +7,6 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
-    "jest.config.ts"
   ],
   "target": "ES2019",
   "lib": [

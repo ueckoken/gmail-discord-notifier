@@ -9,8 +9,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
     project: [
-      'tsconfig.json',
-      'jest.config.ts'
+      'tsconfig.json'
     ]
   },
   rules: {}
