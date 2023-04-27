@@ -1,7 +1,7 @@
 import { describe } from '@jest/globals'
-import { type mailAttachment, msgDescription, chunkMsg } from '../src/mail'
+import { type MailAttachment, msgDescription, chunkMsg } from '../src/mail'
 
-class AttachmentStub implements mailAttachment {
+class AttachmentStub implements MailAttachment {
   readonly nameMock: jest.Mock
   constructor (nameMock: jest.Mock) { this.nameMock = nameMock }
   getName (): string {
