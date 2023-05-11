@@ -1,10 +1,10 @@
 // import '@types/google-apps-script'
-const discordMsgMaxLen = 2000
-export interface mailAttachment {
+const DISCORD_MSG_MAX_LEN = 2000
+export interface MailAttachment {
   getName: () => string
 }
-export interface mailPayload {
-  attachments: mailAttachment[]
+export interface MailPayload {
+  attachments: MailAttachment[]
   plainBody: string
   date: GoogleAppsScript.Base.Date
   from: string
@@ -13,12 +13,12 @@ export interface mailPayload {
   bcc: string
   subject: string
 }
-export interface mailMsgHeader {
-  attachments: mailAttachment[]
+export interface MailMsgHeader {
+  attachments: MailAttachment[]
   plainBody: string
 }
-export interface mailHeader {
-  attachments: mailAttachment[]
+export interface MailHeader {
+  attachments: MailAttachment[]
   date: GoogleAppsScript.Base.Date
   from: string
   to: string
@@ -26,7 +26,7 @@ export interface mailHeader {
   bcc: string
   subject: string
 }
-export const msgDescription = (props: mailMsgHeader): string => {
+export const msgDescription = (props: MailMsgHeader): string => {
   const headerElems: string[] = ['メッセージが届きました！']
   if (props.attachments.length !== 0) {
     headerElems.push('添付ファイルがあります！メール本体の確認をお忘れなく')
@@ -39,7 +39,7 @@ export const msgDescription = (props: mailMsgHeader): string => {
   return headerElems.join('\n')
 }
 
-export const MailHeader = (header: mailHeader): string => {
+export const mailHeader = (header: MailHeader): string => {
   return `[Date] ${header.date.toString()}
 [From] ${header.from}
 [To] ${header.to}
@@ -48,13 +48,13 @@ export const MailHeader = (header: mailHeader): string => {
 [attachment] ${header.attachments.map(a => a.getName()).join(' ')}
 `
 }
-interface msg {
+interface Msg {
   description: string
   text: string
 }
-export const createMsg = (props: mailPayload): msg => {
+export const createMsg = (props: MailPayload): Msg => {
   const description = msgDescription(props)
-  const text = `${MailHeader(props)}
+  const text = `${mailHeader(props)}
 
 ${props.plainBody}
 `
@@ -64,7 +64,7 @@ ${props.plainBody}
   }
 }
 
-export const chunkMsg = (msg: msg, length: number): string[] => {
+export const chunkMsg = (msg: Msg, length: number): string[] => {
   // code要素の中の長さをmaxLenギリギリまで詰めるようにする
   const codeBlockHeader = '```txt'
   const codeBlockFooter = '```'
@@ -139,7 +139,7 @@ function fetchNewMails (searchCond: string): GoogleAppsScript.Gmail.GmailMessage
   return GmailApp.getMessagesForThreads(myThreads)
     .map(msg => msg.slice(-1)[0])
 }
-const GmailToPayload = (msg: GoogleAppsScript.Gmail.GmailMessage): mailPayload => {
+const GmailToPayload = (msg: GoogleAppsScript.Gmail.GmailMessage): MailPayload => {
   return {
     attachments: msg.getAttachments(),
     plainBody: msg.getPlainBody(),
@@ -173,7 +173,7 @@ function main (): void {
       .map(payload => createMsg(payload))
       .reverse()
   ) {
-    for (const msg of chunkMsg(mail, discordMsgMaxLen)) {
+    for (const msg of chunkMsg(mail, DISCORD_MSG_MAX_LEN)) {
       postDiscord(msg)
     }
   }
