@@ -1,8 +1,8 @@
-import { type mailAttachment, msgDescription, chunkMsg } from '../src/mail'
+import { type MailAttachment, msgDescription, chunkMsg } from '../src/mail'
 import { mock, describe, it } from 'node:test'
 import * as assert from 'node:assert/strict'
 
-class AttachmentStub implements mailAttachment {
+class AttachmentStub implements MailAttachment {
   readonly nameMock: ReturnType<typeof mock.fn>
   constructor (nameMock: ReturnType<typeof mock.fn>) { this.nameMock = nameMock }
   getName (): string {
