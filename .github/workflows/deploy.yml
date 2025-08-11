@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: daikikatsuragawa/clasp-action@v1.1.0
+      - uses: daikikatsuragawa/clasp-action@v1.2.0
         with:
           accessToken: ${{ secrets.UECKOKEN_ACCESS_TOKEN }}
           idToken: ${{ secrets.UECKOKEN_ID_TOKEN }}
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: daikikatsuragawa/clasp-action@v1.1.0
+      - uses: daikikatsuragawa/clasp-action@v1.2.0
         with:
           accessToken: ${{ secrets.KOKENSHINKAN_ACCESS_TOKEN }}
           idToken: ${{ secrets.KOKENSHINKAN_ID_TOKEN }}
