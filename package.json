@@ -5,7 +5,7 @@
   "repository": "https://github.com/ueckoken/gmail-discord-notifier.git",
   "author": "ueckoken",
   "devDependencies": {
-    "@google/clasp": "^2.4.2",
+    "@google/clasp": "^3.0.0",
     "@types/google-apps-script": "^1.0.57",
     "@types/node": "^18.13.0",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
